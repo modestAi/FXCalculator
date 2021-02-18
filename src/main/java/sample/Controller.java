@@ -48,7 +48,6 @@ public class Controller implements Initializable{
         borderPane.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 onEquals();
-                System.out.println("Equals");
             }
             borderPane.requestFocus();
         });
@@ -105,7 +104,6 @@ public class Controller implements Initializable{
         }
         if (e.getCode() == KeyCode.EQUALS) {
             onEquals();
-            System.out.println("Equals");
         }
 
         if (e.getCode() == KeyCode.BACK_SPACE) {
@@ -137,7 +135,6 @@ public class Controller implements Initializable{
     public void clearAll() {
         strings.clear();
         label.setText("0");
-        System.out.println("clear all called");
     }
 
     @FXML
@@ -152,7 +149,6 @@ public class Controller implements Initializable{
             strings.clear();
             label.setText("0");
         }
-        System.out.println("Clear Last");
     }
 
     @FXML
@@ -176,7 +172,7 @@ public class Controller implements Initializable{
         return Font.font(fontFamily, fontWeight, fontPosture, fontSize);
     }
 
-    private void settingText() {  //set text when continuously being clicked
+    private void settingText() {  //Set text when  being clicked
         toShow = strings.toString().replace("[", "").replace("]", "").replace(", ", "");
         label.setText(toShow);
     }
@@ -189,7 +185,7 @@ public class Controller implements Initializable{
             strings.clear();
             String nums = String.valueOf(c);
             String result = nums.substring(0, nums.indexOf("."));
-            if (isInteger.test(c)) { //zero trailing
+            if (isInteger.test(c)) {
                 label.setText(result);
                 strings.add(result);
             } else {

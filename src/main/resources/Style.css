@@ -1,0 +1,20 @@
+#needsStyle {
+	 -fx-background-radius: 0;
+}
+
+#needsStyle {
+	 -fx-background-color: transparent;
+}
+
+#needsStyle:hover {
+	 -fx-background-color: #131339;
+	 -fx-effect: dropshadow( three-pass-box , #000000 , 3 , 0.0 , 0 , 1 );
+
+}
+
+#needsStyle:pressed {
+     -fx-background-color: #131339;
+}
+.label{
+	 -fx-effect: dropshadow( three-pass-box , #000000 , 1 , 0.1 , 0 , 1 );
+}

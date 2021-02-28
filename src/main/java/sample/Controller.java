@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.jparsec.error.ParserException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,7 +25,7 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class Controller implements Initializable{
+public class Controller implements Initializable {
 
     @FXML
     private BorderPane borderPane;
@@ -37,21 +38,22 @@ public class Controller implements Initializable{
     @FXML
     public Button equal;
 
-
     List<String> strings = new ArrayList<>();
     String toShow;
     String text;
+    Font font;
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         label.setFocusTraversable(true);
-        borderPane.setOnKeyReleased(this::onKeyPressed);
+        borderPane.setOnKeyReleased(this::onKeyReleased);
         borderPane.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.ENTER) {
                 onEquals();
             }
             borderPane.requestFocus();
         });
-
+        borderPane.setOnKeyPressed(this::onKeyPressed);
+        font = label.getFont();
         Font font = getFont();
 
         Tooltip tooltip = new Tooltip();
@@ -81,11 +83,17 @@ public class Controller implements Initializable{
         }
     }
 
+    private void onKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.BACK_SPACE) {
+            this.clearLast();
+        }
+    }
+
     @FXML
     private void clicked(ActionEvent e) {
 
         text = ((Button) e.getSource()).getText();
-        strings.add(text);
+        addToList(text);
         if (strings.size() > 1) {
             settingText();
         } else {
@@ -93,13 +101,13 @@ public class Controller implements Initializable{
         }
     }
 
-    void onKeyPressed(KeyEvent e) {
+    void onKeyReleased(KeyEvent e) {
 
         if (e.getCode() == KeyCode.ESCAPE || e.getCode() == KeyCode.DELETE) {
             clearAll();
         }
         if (e.getCode() == KeyCode.LEFT_PARENTHESIS || e.getCode() == KeyCode.RIGHT_PARENTHESIS) {
-            strings.add(e.getText());
+            addToList(e.getText());
             settingText();
         }
         if (e.getCode() == KeyCode.EQUALS) {
@@ -109,8 +117,9 @@ public class Controller implements Initializable{
         if (e.getCode() == KeyCode.BACK_SPACE) {
             clearLast();
         }
-        if (e.getCode().isDigitKey()) {
-            strings.add(e.getText());
+
+        if (e.getCode().isDigitKey() || e.getCode() == KeyCode.DECIMAL) {
+            addToList(e.getText());
             settingText();
         }
         var keyCodes = new ArrayList<KeyCode>();
@@ -120,9 +129,40 @@ public class Controller implements Initializable{
         keyCodes.add(KeyCode.MULTIPLY);
         for (var c : keyCodes) {
             if (e.getCode() == c) {
-                strings.add(e.getText());
+                addToList(e.getText());
                 settingText();
             }
+        }
+    }
+
+    private void addToList(String text) {
+        if (checkSize()) {
+            strings.add(text);
+        }
+    }
+
+    @FXML
+    public void onEquals() {
+        try {
+            String test = String.join("", strings);
+            double c = EvalString.eval(test);
+            strings.clear();
+            if (!Double.isInfinite(c)) {
+                String nums = String.valueOf(c);
+                String result = nums.substring(0, nums.indexOf("."));
+                if (isInteger.test(c)) {
+                    label.setText(result);
+                    addToList(result);
+                } else {
+                    addToList(nums);
+                    label.setText(nums);
+                }
+            } else {
+                label.setText("Cannot Divide by Zero");
+            }
+        } catch (IllegalArgumentException | ParserException e) {
+            strings.clear();
+            label.setText("Syntax Error");
         }
     }
 
@@ -138,24 +178,9 @@ public class Controller implements Initializable{
     }
 
     @FXML
-    public void clearLast() {
-
-        int index = strings.size() - 1;
-        if (index > 0) {
-            strings.remove(index);
-            settingText();
-        }
-        if (index == 0) {
-            strings.clear();
-            label.setText("0");
-        }
-    }
-
-    @FXML
     public void onClose(ActionEvent event) {
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         stage.close();
-
     }
 
     @FXML
@@ -174,27 +199,26 @@ public class Controller implements Initializable{
 
     private void settingText() {  //Set text when  being clicked
         toShow = strings.toString().replace("[", "").replace("]", "").replace(", ", "");
-        label.setText(toShow);
+        if (checkSize()) {
+            label.setText(toShow);
+        }
     }
 
     @FXML
-    public void onEquals() {
-        try {
-            String test = String.join("", strings);
-            double c = EvalString.eval(test);
-            strings.clear();
-            String nums = String.valueOf(c);
-            String result = nums.substring(0, nums.indexOf("."));
-            if (isInteger.test(c)) {
-                label.setText(result);
-                strings.add(result);
-            } else {
-                strings.add(nums);
-                label.setText(result);
-            }
-        } catch (IllegalArgumentException e) {
-            label.setText("Syntax Error");
-            e.printStackTrace();
+    public void clearLast() {
+
+        int index = strings.size() - 1;
+        if (index > 0) {
+            strings.remove(index);
+            settingText();
         }
+        if (index == 0) {
+            strings.clear();
+            label.setText("0");
+        }
+    }
+
+    public boolean checkSize() {
+        return strings.size() < 19;
     }
 }

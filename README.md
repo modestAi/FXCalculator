@@ -1,5 +1,9 @@
 # CalculatorFX
 
-A calculator made using JavaFX and [jparsec](https://github.com/jparsec/jparsec)
+A calculator made using JavaFX and [jparsec](https://github.com/jparsec/jparsec).
+
+Here is a screenshot of the same, the mouse cursor although not visible in the screenshot was over the `=` which activated the css property:
 
 [![](https://i.postimg.cc/ht4QJZQH/image.png)](https://postimg.cc/tYf4w555)
+
+Here is the result after the operation:

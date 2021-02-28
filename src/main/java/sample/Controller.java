@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
@@ -151,10 +152,10 @@ public class Controller implements Initializable {
                 String nums = String.valueOf(c);
                 String result = nums.substring(0, nums.indexOf("."));
                 if (isInteger.test(c)) {
+                    addToList(result.split(""));
                     label.setText(result);
-                    addToList(result);
                 } else {
-                    addToList(nums);
+                    addToList(nums.split(""));
                     label.setText(nums);
                 }
             } else {
@@ -164,6 +165,11 @@ public class Controller implements Initializable {
             strings.clear();
             label.setText("Syntax Error");
         }
+    }
+
+    void addToList(String[] array) {
+        if (strings.size() < 19)
+            strings.addAll(Arrays.asList(array));
     }
 
     Predicate<Double> isInteger = e -> {
